@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Text to Voice Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f7f7f7;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            resize: vertical;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        audio {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        #loader {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text to Voice Generator</h1>
+    <form id="voiceForm">
+        <textarea name="text" rows="5" placeholder="Enter your text here..." required></textarea>
+        <button type="submit">Generate Voice</button>
+    </form>
+
+    <div id="loader">Generating voice, please wait...</div>
+    <audio controls id="audioPlayer" style="display: none;"></audio>
+
+    <script>
+        const form = document.getElementById("voiceForm");
+        const audioPlayer = document.getElementById("audioPlayer");
+        const loader = document.getElementById("loader");
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            loader.style.display = "block";
+            audioPlayer.style.display = "none";
+
+            try {
+                const response = await fetch("/api/generate-voice/", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const blob = await response.blob();
+                const audioUrl = URL.createObjectURL(blob);
+
+                audioPlayer.src = audioUrl;
+                audioPlayer.style.display = "block";
+                audioPlayer.play();
+            } catch (error) {
+                alert("Something went wrong.");
+                console.error(error);
+            } finally {
+                loader.style.display = "none";
+            }
+        };
+    </script>
+</body>
+</html>
